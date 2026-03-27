@@ -1,28 +1,31 @@
 using UnityEngine;
+using UnityEngine.AI;
 
-public class enemyBehaviour : MonoBehaviour
+public class enemy : MonoBehaviour
 {
-    [Header("Enemy Settings")]
-    public float moveSpeed = 2f; // Prêdkoœæ poruszania siê w stronê gracza
-    public float RotationSpeed = 5f; // Prêdkoœæ obracania siê w stronê gracza
-    void Start()
-    {
+    [Header("Ustawienia celu")]
+    public Transform player;
 
+    [Header("Ustawienia AI")]
+    public float updateRate = 0.2f;
+
+    private NavMeshAgent agent;
+
+    private void Awake()
+    {
+       agent = GetComponent<NavMeshAgent>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        MoveToPlayer();
+        InvokeRepeating(nameof(UpdatePath), 0f, updateRate);
     }
-    void MoveToPlayer()
+
+    void UpdatePath()
     {
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
+        if (player != null && agent.enabled && agent.isOnNavMesh)
         {
-            Vector3 direction = (player.transform.position - transform.position).normalized;
-
-            transform.position += direction * moveSpeed * Time.deltaTime;
+            agent.SetDestination(player.position);
         }
     }
 }
